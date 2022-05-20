@@ -1,0 +1,4 @@
+/public/
+/vendor/
+*.local
+*.log

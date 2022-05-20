@@ -1,0 +1,9 @@
+{
+    "name": "leboto/gprod",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}
