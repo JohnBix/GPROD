@@ -21,7 +21,7 @@ class StockController {
      */
     private function checkStockIfNull(int $id): int
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM stock WHERE quantity <= 0  AND id = ?");
+        $stmt = $this->pdo->prepare("SELECT * FROM stock WHERE quantity = 0  AND id = ?");
         $stmt->execute([$id]);
         $result = $stmt->fetch();
         if (!empty($result)) {
@@ -86,9 +86,16 @@ class StockController {
         if ($check !== 1) {
             $prod_quantity = $this->getStockQuantity($id);
             $new_quantity = $prod_quantity - $stock->getQuantity();
-            $stmt = $this->pdo->prepare("UPDATE stock SET quantity = ? WHERE id = ?");
-            $stmt->execute([$new_quantity, $id]);
-            return null;
+            if ($new_quantity >= 0) {
+                $stmt = $this->pdo->prepare("UPDATE stock SET quantity = ? WHERE id = ?");
+                $stmt->execute([$new_quantity, $id]);
+                return null;
+            } else {
+                return [
+                    "status" => "error",
+                    "message" => "Cannot reduce the stock to $new_quantity"
+                ];
+            }
         } else {
             return [
                 "status" => "error",
