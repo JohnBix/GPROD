@@ -101,11 +101,11 @@ class CategoryController {
     }
     
     /**
-     * Retrieve all categories
+     * Get all categories
      *
      * @return array
      */
-    public function findAllCategory(): array
+    public function findAllCategories(): array
     {
         $stmt = $this->pdo->query("SELECT * FROM category");
         $result = $stmt->fetchAll();
