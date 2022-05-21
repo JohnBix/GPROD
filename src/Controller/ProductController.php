@@ -192,23 +192,56 @@ class ProductController {
             ];
         }   
     }
-    
+        
+    /**
+     * Get an ID of product stock
+     *
+     * @param  int $id
+     * @return int
+     */
+    private function findProductStockId(int $id): int
+    {
+        $stmt = $this->pdo->prepare("SELECT stock_id FROM product WHERE id = ?");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch();
+        if (!empty($result)) {
+            return $result["stock_id"];
+        } else {
+            return 0;
+        }
+    }
+
     /**
      * Delete a product
      *
-     * @param  int $id
+     * @param  int $id ID of a product
      * @return array
      */
     public function removeProduct(int $id): array
     {
         $check = $this->checkProductById($id);
         if ($check === 1) {
-            $stmt = $this->pdo->prepare("DELETE FROM product WHERE id = ?");
-            $stmt->execute([$id]);
-            return [
-                "status" => "success",
-                "message" => "Product successfully deleted"
-            ];
+            $stock_id = $this->findProductStockId($id);
+            // Start a transaction to delete product and stock
+            try {
+                $this->pdo->beginTransaction();
+                $stmt = $this->pdo->prepare("DELETE FROM product WHERE id = ?");
+                $stmt->execute([$id]);
+                $stockController = new StockController($this->pdo);
+                $res = $stockController->deleteStock($stock_id);
+                $this->pdo->commit();
+                return [
+                    "status" => "success",
+                    "message" => "Product successfully deleted"
+                ];
+            } catch (\Exception $e) {
+                $this->pdo->rollBack();
+                return [
+                    "status" => "error",
+                    "message" => "Something was wrong. Please try again!"
+                ];
+            }
+            // End Transaction
         } else {
             return [
                 "status" => "error",

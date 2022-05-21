@@ -63,24 +63,28 @@ class StockController {
      *
      * @param  int $id ID of product stock
      * @param  Stock $stock
-     * @return void
+     * @return array
      */
-    public function incStock(int $id, Stock $stock): void
+    public function incStock(int $id, Stock $stock): array
     {
         $prod_quantity = $this->getStockQuantity($id);
         $new_quantity = $prod_quantity + $stock->getQuantity();
         $stmt = $this->pdo->prepare("UPDATE stock SET quantity = ? WHERE id = ?");
         $stmt->execute([$new_quantity, $id]);
+        return [
+            "status" => "success",
+            "message" => "Stock successfully incremented"
+        ];
     }
     
     /**
-     * Disincrement a product stock
+     * Decrement a product stock
      *
      * @param  int $id ID of product stock
      * @param  Stock $stock
-     * @return null|array
+     * @return array
      */
-    public function disStock(int $id, Stock $stock): ?array
+    public function decStock(int $id, Stock $stock): array
     {
         $check = $this->checkStockIfNull($id);
         if ($check !== 1) {
@@ -89,17 +93,20 @@ class StockController {
             if ($new_quantity >= 0) {
                 $stmt = $this->pdo->prepare("UPDATE stock SET quantity = ? WHERE id = ?");
                 $stmt->execute([$new_quantity, $id]);
-                return null;
+                return [
+                    "status" => "success",
+                    "message" => "Stock successfully decremented"
+                ];
             } else {
                 return [
                     "status" => "error",
-                    "message" => "Cannot reduce the stock to $new_quantity"
+                    "message" => "Cannot reduce stock to $new_quantity"
                 ];
             }
         } else {
             return [
                 "status" => "error",
-                "message" => "Cannot reduce the stock. It's already 0"
+                "message" => "Can no longer reduce the stock. It's already at 0"
             ];
         }
     }
