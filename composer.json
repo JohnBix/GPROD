@@ -5,5 +5,8 @@
             "App\\": "src/"
         }
     },
-    "require": {}
+    "require": {
+        "altorouter/altorouter": "1.2.0",
+        "phpunit/phpunit": "4.5.*"
+    }
 }

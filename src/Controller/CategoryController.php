@@ -86,12 +86,20 @@ class CategoryController {
         $check = $this->checkCategoryById($id);
         if ($check === 1) {
             $name = $category->getName();
-            $stmt = $this->pdo->prepare("UPDATE category SET name = ? WHERE id = ?");
-            $stmt->execute([$name, $id]);
-            return [
-                "status" => "success",
-                "message" => "Category successfully modified"
-            ];
+            $verify = $this->checkCategoryByName($name);
+            if ($verify === 1) {
+                return [
+                    "status" => "error",
+                    "message" => "Name already exists"
+                ];
+            } else {
+                $stmt = $this->pdo->prepare("UPDATE category SET name = ? WHERE id = ?");
+                $stmt->execute([$name, $id]);
+                return [
+                    "status" => "success",
+                    "message" => "Category successfully modified"
+                ];                
+            }
         } else {
             return [
                 "status" => "error",
