@@ -93,12 +93,20 @@ class ProductController {
         $check = $this->checkProductById($id);
         if ($check === 1) {
             $designation = $product->getDesignation();
-            $stmt = $this->pdo->prepare("UPDATE product SET designation = ? WHERE id = ?");
-            $stmt->execute([$designation, $id]);
-            return [
-                "status" => "success",
-                "message" => "Product successfully modified"
-            ];
+            $verify = $this->checkProductByDesignation($designation);
+            if ($verify === 1) {
+                return [
+                    "status" => "error",
+                    "message" => "Name already exists"
+                ];
+            } else {
+                $stmt = $this->pdo->prepare("UPDATE product SET designation = ? WHERE id = ?");
+                $stmt->execute([$designation, $id]);
+                return [
+                    "status" => "success",
+                    "message" => "Product successfully modified"
+                ];
+            }
         } else {
             return [
                 "status" => "error",
@@ -194,12 +202,12 @@ class ProductController {
     }
         
     /**
-     * Get an ID of product stock
+     * Get the ID of product stock
      *
      * @param  int $id
      * @return int
      */
-    private function findProductStockId(int $id): int
+    public function findProductStockId(int $id): int
     {
         $stmt = $this->pdo->prepare("SELECT stock_id FROM product WHERE id = ?");
         $stmt->execute([$id]);

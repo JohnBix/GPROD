@@ -12,7 +12,13 @@
 <body class="d-flex flex-column h-100">
     <div class="nav-fixed">
         <nav class="nav-wrapper blue-grey lighten-4">
-            <a href="#" class="brand-logo">GPROD</a>
+            <a href="<?= $this->router->generate("all_products") ?>" class="brand-logo">GPROD</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="javascript:void(0)">Profil</a></li>
+                <li><a href="javascript:void(0)">Users</a></li>
+                <li><a href="<?= $this->router->generate("all_categories") ?>">Categories</a></li>
+                <li><a href="javascript:void(0)">Log out</a></li>
+            </ul>
         </nav>
     </div> 
 
