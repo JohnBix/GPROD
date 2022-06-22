@@ -6,25 +6,29 @@ use App\Model\Product;
 use App\Model\Stock;
 use App\Utilities\Connexion;
 
-$pdo = Connexion::getPDO();
-$cc = new CategoryController($pdo);
-$pc = new ProductController($pdo);
-$categories = $cc->findAllCategories()["categories"];
+session_start();
 
-if (!empty($_POST)) {
-    extract($_POST);
-    $designation = trim($designation);
-    $quantity = (int) trim($quantity);
-    $category_id = (int) trim($category_id);
-    
-    $new_stock = new Stock();
-    $new_stock->setQuantity($quantity);
-    $new_product = new Product();
-    $new_product->setDesignation($designation)
-                ->setCategoryId($category_id)
-            ;
-    $result = $pc->addProduct($new_product, $new_stock);
-}
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
+
+    $pdo = Connexion::getPDO();
+    $cc = new CategoryController($pdo);
+    $pc = new ProductController($pdo);
+    $categories = $cc->findAllCategories()["categories"];
+
+    if (!empty($_POST)) {
+        extract($_POST);
+        $designation = trim($designation);
+        $quantity = (int) trim($quantity);
+        $category_id = (int) trim($category_id);
+        
+        $new_stock = new Stock();
+        $new_stock->setQuantity($quantity);
+        $new_product = new Product();
+        $new_product->setDesignation($designation)
+                    ->setCategoryId($category_id)
+                ;
+        $result = $pc->addProduct($new_product, $new_stock);
+    }
 
 ?>
 <div class="add">
@@ -62,3 +66,6 @@ if (!empty($_POST)) {
         </div>
     </form>
 </div>
+<?php else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

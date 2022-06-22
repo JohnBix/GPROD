@@ -4,20 +4,23 @@ use App\Controller\CategoryController;
 use App\Model\Category;
 use App\Utilities\Connexion;
 
-$id = (int) $params['id'];
-$pdo = Connexion::getPDO();
-$cc = new CategoryController($pdo);
-$category = $cc->findCategoryById($id)['category'];
+session_start();
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
 
-if (!empty($_POST)) {
-    extract($_POST);
-    $name = trim($name);
-    $new = new Category();
-    $new->setName($name);
-    $result = $cc->editCategory($id, $new);
-}
+    $id = (int) $params['id'];
+    $pdo = Connexion::getPDO();
+    $cc = new CategoryController($pdo);
+    $category = $cc->findCategoryById($id)['category'];
 
-if (is_null($category)):
+    if (!empty($_POST)) {
+        extract($_POST);
+        $name = trim($name);
+        $new = new Category();
+        $new->setName($name);
+        $result = $cc->editCategory($id, $new);
+    }
+
+    if (is_null($category)):
 ?>
 <h2>Oops! Invalid URL</h2>
 <p>No informations for this ID (here <?= $id ?>).</p>
@@ -67,4 +70,7 @@ if (is_null($category)):
         </form>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;
+else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

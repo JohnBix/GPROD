@@ -5,28 +5,32 @@ use App\Controller\StockController;
 use App\Model\Stock;
 use App\Utilities\Connexion;
 
-$id = (int) $params['id'];
-$pdo = Connexion::getPDO();
-$pc = new ProductController($pdo);
-$sc = new StockController($pdo);
-$product = $pc->findProductById($id)["product"];
-$stock_id = $pc->findProductStockId($id);
+session_start();
 
-if (!empty($_POST)) {
-    extract($_POST);
-    $stock = new Stock();
-    if (array_key_exists("incr", $_POST)) {
-        $incr = (int) trim($incr);
-        $stock->setQuantity($incr);
-        $result = $sc->incStock($stock_id, $stock);
-    } else {
-        $decr = (int) trim($decr);
-        $stock->setQuantity($decr);
-        $result = $sc->decStock($stock_id, $stock);
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
+
+    $id = (int) $params['id'];
+    $pdo = Connexion::getPDO();
+    $pc = new ProductController($pdo);
+    $sc = new StockController($pdo);
+    $product = $pc->findProductById($id)["product"];
+    $stock_id = $pc->findProductStockId($id);
+
+    if (!empty($_POST)) {
+        extract($_POST);
+        $stock = new Stock();
+        if (array_key_exists("incr", $_POST)) {
+            $incr = (int) trim($incr);
+            $stock->setQuantity($incr);
+            $result = $sc->incStock($stock_id, $stock);
+        } else {
+            $decr = (int) trim($decr);
+            $stock->setQuantity($decr);
+            $result = $sc->decStock($stock_id, $stock);
+        }
     }
-}
 
-if (is_null($product)):
+    if (is_null($product)):
 ?>
 <h2>Oops! Invalid URL</h2>
 <p>No informations for this ID (here <?= $id ?>).</p>
@@ -76,4 +80,7 @@ if (is_null($product)):
         </form>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;
+else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

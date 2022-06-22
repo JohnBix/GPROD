@@ -1,0 +1,5 @@
+nav {margin-bottom: 10px;}
+footer {margin-top: auto; padding: 4px 0;}
+.add, .quantity { margin: auto; width: 50%;}
+#linkEdit, input[type=submit]{width: 100%; margin: 4px 0;}
+.tabs .tab a {color: black !important;}

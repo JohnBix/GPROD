@@ -3,9 +3,13 @@
 use App\Controller\ProductController;
 use App\Utilities\Connexion;
 
-$pdo = Connexion::getPDO();
-$pc = new ProductController($pdo);
-$all = $pc->findAllProducts()["products"];
+session_start();
+
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
+    
+    $pdo = Connexion::getPDO();
+    $pc = new ProductController($pdo);
+    $all = $pc->findAllProducts()["products"];
 
 ?>
 <a href="<?= $this->router->generate("product_add") ?>" class="btn-flat blue-grey lighten-5">New product...</a>
@@ -45,3 +49,6 @@ $all = $pc->findAllProducts()["products"];
         </tbody>
     </table>
 </div>
+<?php else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

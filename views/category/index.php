@@ -3,9 +3,13 @@
 use App\Controller\CategoryController;
 use App\Utilities\Connexion;
 
-$pdo = Connexion::getPDO();
-$cc = new CategoryController($pdo);
-$all = $cc->findAllCategories()["categories"];
+session_start();
+
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
+
+    $pdo = Connexion::getPDO();
+    $cc = new CategoryController($pdo);
+    $all = $cc->findAllCategories()["categories"];
 
 ?>
 <a href="<?= $this->router->generate("category_add") ?>" class="btn-flat blue-grey lighten-5">New category...</a>
@@ -41,3 +45,6 @@ $all = $cc->findAllCategories()["categories"];
         </tbody>
     </table>
 </div>
+<?php else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

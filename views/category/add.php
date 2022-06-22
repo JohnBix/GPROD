@@ -4,16 +4,19 @@ use App\Controller\CategoryController;
 use App\Model\Category;
 use App\Utilities\Connexion;
 
-$pdo = Connexion::getPDO();
-$cc = new CategoryController($pdo);
+session_start();
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
 
-if (!empty($_POST)) {
-    extract($_POST);
-    $name = trim($name);
-    $new = new Category();
-    $new->setName($name);
-    $result = $cc->addCategory($new);
-}
+    $pdo = Connexion::getPDO();
+    $cc = new CategoryController($pdo);
+
+    if (!empty($_POST)) {
+        extract($_POST);
+        $name = trim($name);
+        $new = new Category();
+        $new->setName($name);
+        $result = $cc->addCategory($new);
+    }
 
 ?>
 <div class="add">
@@ -38,3 +41,6 @@ if (!empty($_POST)) {
         </div>
     </form>
 </div>
+<?php else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>
