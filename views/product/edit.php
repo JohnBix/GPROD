@@ -4,20 +4,24 @@ use App\Controller\ProductController;
 use App\Model\Product;
 use App\Utilities\Connexion;
 
-$id = (int) $params['id'];
-$pdo = Connexion::getPDO();
-$pc = new ProductController($pdo);
-$product = $pc->findProductById($id)["product"];
+session_start();
 
-if (!empty($_POST)) {
-    extract($_POST);
-    $designation = trim($designation);
-    $new_prod = new Product();
-    $new_prod->setDesignation($designation);
-    $result = $pc->editProduct($id, $new_prod);
-}
+if (!empty($_SESSION) && array_key_exists("email", $_SESSION)):
 
-if (is_null($product)):
+    $id = (int) $params['id'];
+    $pdo = Connexion::getPDO();
+    $pc = new ProductController($pdo);
+    $product = $pc->findProductById($id)["product"];
+
+    if (!empty($_POST)) {
+        extract($_POST);
+        $designation = trim($designation);
+        $new_prod = new Product();
+        $new_prod->setDesignation($designation);
+        $result = $pc->editProduct($id, $new_prod);
+    }
+
+    if (is_null($product)):
 ?>
 <h2>Oops! Invalid URL</h2>
 <p>No informations for this ID (here <?= $id ?>).</p>
@@ -76,4 +80,7 @@ if (is_null($product)):
         </form>
     </div>
 </div>
-<?php endif; ?>
+<?php endif;
+else:
+    header("Location: ". $this->router->generate("login"));
+endif; ?>

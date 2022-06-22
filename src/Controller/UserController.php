@@ -85,6 +85,27 @@ class UserController {
             return 0;
         }
     }
+    
+    /**
+     * Verify if User exists
+     *
+     * @param  User $user
+     * @return array|NULL
+     */
+    public function checkLogin(User $user): ?array
+    {
+        $pseudo = base64_encode($user->getPseudo());
+        $password = base64_encode($user->getPassword());
+        
+        $stmt = $this->pdo->prepare("SELECT email, role FROM user WHERE pwd = ? AND pseudo = ?");
+        $stmt->execute([$password, $pseudo]);
+        $result = $stmt->fetch();
+        if (!empty($result)) {
+            return $result;
+        } else {
+            return NULL;
+        }
+    }
 
     /**
      * Method for adding an user
@@ -102,7 +123,7 @@ class UserController {
             if ($check != 1) {
                 $password = base64_encode($user->getPassword());
                 $role = base64_encode($user->getRole());
-                $stmt = $this->pdo->prepare("INSERT INTO user (id, email, pseudo, password, role) VALUES (NULL, ?, ?, ?, ?)");
+                $stmt = $this->pdo->prepare("INSERT INTO user (id, email, pseudo, pwd, role) VALUES (NULL, ?, ?, ?, ?)");
                 $stmt->execute([$email, $pseudo, $password, $role]);
                 return [
                     "status" => "success",
@@ -142,7 +163,7 @@ class UserController {
                 ];
             } else {
                 $password = base64_encode($user->getPassword());
-                $stmt = $this->pdo->prepare("UPDATE user SET pseudo = ?, password = ? WHERE id = ?");
+                $stmt = $this->pdo->prepare("UPDATE user SET pseudo = ?, pwd = ? WHERE id = ?");
                 $stmt->execute([$pseudo, $password, $id]);
                 return [
                     "status" => "success",
@@ -181,9 +202,9 @@ class UserController {
      * Search an User filter by ID
      *
      * @param  int $id
-     * @return array
+     * @return array|NULL
      */
-    public function findUserById($id): array
+    public function findUserById($id): ?array
     {
         $stmt = $this->pdo->prepare("SELECT * FROM user WHERE id = ?");
         $stmt->execute([$id]);
@@ -198,7 +219,31 @@ class UserController {
             ];
         }
     }
-    
+        
+    /**
+     * Search an User filter by email
+     *
+     * @param  string $email
+     * @return array|NULL
+     */
+    public function findUserByEmail($email): ?array
+    {
+        $email = base64_encode($email);
+        $stmt = $this->pdo->prepare("SELECT * FROM user WHERE email = ?");
+        $stmt->execute([$email]);
+        $result = $stmt->fetch();
+        if (!empty($result)) {
+            return [
+                "user" => $result
+            ];
+        } else {
+            return [
+                "user" => NULL
+            ];
+        }
+    }
+
+
     /**
      * Delete an User
      *

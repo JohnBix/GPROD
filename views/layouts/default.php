@@ -14,10 +14,12 @@
         <nav class="nav-wrapper blue-grey lighten-4">
             <a href="<?= $this->router->generate("all_products") ?>" class="brand-logo">GPROD</a>
             <ul class="right hide-on-med-and-down">
-                <li><a href="javascript:void(0)">Profil</a></li>
-                <li><a href="javascript:void(0)">Users</a></li>
+                <?php if(!empty($_SESSION)): ?>
+                <li><a href="<?= $this->router->generate("profil") ?>">Profil</a></li>
+                <?= $_SESSION["grole"] == base64_encode("superadmin") ? "<li><a href=" .$this->router->generate("all_users"). ">Users</a></li>" : "" ?>
                 <li><a href="<?= $this->router->generate("all_categories") ?>">Categories</a></li>
-                <li><a href="javascript:void(0)">Log out</a></li>
+                <li><a href="<?= $this->router->generate("logout") ?>">Log out</a></li>
+                <?php endif;?>
             </ul>
         </nav>
     </div> 
